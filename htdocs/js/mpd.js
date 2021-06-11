@@ -66,7 +66,7 @@ var app = $.sammy(function() {
         pagination = parseInt(this.params['splat'][0]);
         current_app = 'browse';
         $('#breadcrump').removeClass('hide').empty().append("<li><a uri=\"\" onclick=\"set_filter('')\">root</a></li>");
-		add_filter();
+        add_filter();
         $('#salamisandwich').removeClass('hide').find("tr:gt(0)").remove();
         socket.send('MPD_API_GET_BROWSE,'+pagination+','+(browsepath ? browsepath : "/"));
         // Don't add all songs from root
@@ -141,63 +141,63 @@ $(document).ready(function(){
         $('#btnautoplay').addClass("active")
 
     document.getElementById('player').addEventListener('stalled', function() {
-						if ( !document.getElementById('player').paused ) {
-							this.pause();
-							clickLocalPlay();
-							$('.top-right').notify({
-								message:{text:"music stream stalled - trying to recover..."},
-								type: "danger",
-								fadeOut: { enabled: true, delay: 1000 },
-							}).show();
-						}
+                        if ( !document.getElementById('player').paused ) {
+                            this.pause();
+                            clickLocalPlay();
+                            $('.top-right').notify({
+                                message:{text:"music stream stalled - trying to recover..."},
+                                type: "danger",
+                                fadeOut: { enabled: true, delay: 1000 },
+                            }).show();
+                        }
     });
 
     document.getElementById('player').addEventListener('pause', function() {
         this.src='';
         this.removeAttribute("src");
-    	$("#localplay-icon").removeClass("glyphicon-pause").addClass("glyphicon-play");
+        $("#localplay-icon").removeClass("glyphicon-pause").addClass("glyphicon-play");
     });
 
-	document.getElementById('player').addEventListener('error', function failed(e) {
-		this.pause();
-		switch (e.target.error.code) {
-			case e.target.error.MEDIA_ERR_ABORTED:
-				$('.top-right').notify({
-					message:{text:"Audio playback aborted by user."},
-					type: "info",
-					fadeOut: { enabled: true, delay: 1000 },
-				}).show();
-				break;
-			case e.target.error.MEDIA_ERR_NETWORK:
-				$('.top-right').notify({
-					message:{text:"Network error while playing audio."},
-					type: "danger",
-					fadeOut: { enabled: true, delay: 1000 },
-				}).show();
-				break;
-			case e.target.error.MEDIA_ERR_DECODE:
-				$('.top-right').notify({
-					message:{text:"Audio playback aborted. Did you unplug your headphones?"},
-					type: "danger",
-					fadeOut: { enabled: true, delay: 1000 },
-				}).show();
-				break;
-			case e.target.error.MEDIA_ERR_SRC_NOT_SUPPORTED:
-				$('.top-right').notify({
-					message:{text:"Error while loading audio (server, network or format error)."},
-					type: "danger",
-					fadeOut: { enabled: true, delay: 1000 },
-				}).show();
-				break;
-			default:
-				$('.top-right').notify({
-					message:{text:"Unknown error while playing audio."},
-					type: "danger",
-					fadeOut: { enabled: true, delay: 1000 },
-				}).show();
-				break;
-		}
-	}, true);
+    document.getElementById('player').addEventListener('error', function failed(e) {
+        this.pause();
+        switch (e.target.error.code) {
+            case e.target.error.MEDIA_ERR_ABORTED:
+                $('.top-right').notify({
+                    message:{text:"Audio playback aborted by user."},
+                    type: "info",
+                    fadeOut: { enabled: true, delay: 1000 },
+                }).show();
+                break;
+            case e.target.error.MEDIA_ERR_NETWORK:
+                $('.top-right').notify({
+                    message:{text:"Network error while playing audio."},
+                    type: "danger",
+                    fadeOut: { enabled: true, delay: 1000 },
+                }).show();
+                break;
+            case e.target.error.MEDIA_ERR_DECODE:
+                $('.top-right').notify({
+                    message:{text:"Audio playback aborted. Did you unplug your headphones?"},
+                    type: "danger",
+                    fadeOut: { enabled: true, delay: 1000 },
+                }).show();
+                break;
+            case e.target.error.MEDIA_ERR_SRC_NOT_SUPPORTED:
+                $('.top-right').notify({
+                    message:{text:"Error while loading audio (server, network or format error)."},
+                    type: "danger",
+                    fadeOut: { enabled: true, delay: 1000 },
+                }).show();
+                break;
+            default:
+                $('.top-right').notify({
+                    message:{text:"Unknown error while playing audio."},
+                    type: "danger",
+                    fadeOut: { enabled: true, delay: 1000 },
+                }).show();
+                break;
+        }
+    }, true);
 });
 
 function webSocketConnect() {
@@ -441,9 +441,9 @@ function webSocketConnect() {
                                     pagination = 0;
                                     browsepath = $(this).attr("uri");
                                     $("#browse > a").attr("href", '#/browse/'+pagination+'/'+browsepath);
-									$('#filter > a').attr("href", '#/browse/'+pagination+'/'+browsepath);
+                                    $('#filter > a').attr("href", '#/browse/'+pagination+'/'+browsepath);
                                     app.setLocation('#/browse/'+pagination+'/'+browsepath);
-									set_filter('');
+                                    set_filter('');
                                     break;
                                 case 'song':
                                     socket.send("MPD_API_ADD_TRACK," + decodeURI($(this).attr("uri")));
@@ -465,16 +465,16 @@ function webSocketConnect() {
                         }
                     });
 
-					$('#breadcrump > li > a').on({
-						click: function() {
-							pagination = 0;
-							browsepath = $(this).attr("uri");
-							$("#browse > a").attr("href", '#/browse/'+pagination+'/'+browsepath);
-							$('#filter > a').attr("href", '#/browse/'+pagination+'/'+browsepath);
-							app.setLocation('#/browse/'+pagination+'/'+browsepath);
-							set_filter('');
-						}
-					});
+                    $('#breadcrump > li > a').on({
+                        click: function() {
+                            pagination = 0;
+                            browsepath = $(this).attr("uri");
+                            $("#browse > a").attr("href", '#/browse/'+pagination+'/'+browsepath);
+                            $('#filter > a').attr("href", '#/browse/'+pagination+'/'+browsepath);
+                            app.setLocation('#/browse/'+pagination+'/'+browsepath);
+                            set_filter('');
+                        }
+                    });
 
                     break;
                 case 'state':
@@ -491,8 +491,8 @@ function webSocketConnect() {
 
                     var elapsed_minutes = Math.floor(obj.data.elapsedTime / 60);
                     var elapsed_seconds = obj.data.elapsedTime - elapsed_minutes * 60;
-
                     $('#volumeslider').slider(obj.data.volume);
+                    $('#volume-number').text(obj.data.volume+"%")
                     var progress = Math.floor(100*obj.data.elapsedTime/obj.data.totalTime);
                     $('#progressbar').slider(progress);
 
@@ -534,13 +534,13 @@ function webSocketConnect() {
                 case 'outputnames':
                     $('#btn-outputs-block button').remove();
                     if ( Object.keys(obj.data).length ) {
-		        $.each(obj.data, function(id, name){
+                $.each(obj.data, function(id, name){
                             var btn = $('<button id="btnoutput'+id+'" class="btn btn-default" onclick="toggleoutput(this, '+id+')"><span class="glyphicon glyphicon-volume-up"></span> '+name+'</button>');
                             btn.appendTo($('#btn-outputs-block'));
                         });
-		    } else {
+            } else {
                         $('#btn-outputs-block').addClass('hide');
-		    }
+            }
                     /* remove cache, since the buttons have been recreated */
                     last_outputs = '';
                     break;
@@ -572,7 +572,7 @@ function webSocketConnect() {
                     $('#album').text("");
                     $('#artist').text("");
 
-					$('#btnlove').removeClass("active");
+                    $('#btnlove').removeClass("active");
 
                     $('#currenttrack').text(" " + obj.data.title);
                     var notification = "<strong><h4>" + obj.data.title + "</h4></strong>";
@@ -686,17 +686,17 @@ var updatePlayIcon = function(state)
     if(state == 1) { // stop
         $("#play-icon").addClass("glyphicon-play");
         $('#track-icon').addClass("glyphicon-stop");
-		document.getElementById('player').pause();
+        document.getElementById('player').pause();
     } else if(state == 2) { // play
         $("#play-icon").addClass("glyphicon-pause");
         $('#track-icon').addClass("glyphicon-play");
         if ( ($.cookie("autoplay") === "true") && (player.paused) ) {
-			clickLocalPlay();
-		}
+            clickLocalPlay();
+        }
     } else { // pause
         $("#play-icon").addClass("glyphicon-play");
         $('#track-icon').addClass("glyphicon-pause");
-		document.getElementById('player').pause();
+        document.getElementById('player').pause();
     }
 }
 
@@ -731,11 +731,11 @@ function clickPlay() {
 function clickLocalPlay() {
     var player = document.getElementById('player');
     $("#localplay-icon").removeClass("glyphicon-play").removeClass("glyphicon-pause");
-	
+    
 
     if ( !$('#track-icon').hasClass('glyphicon-play') ) {
-		clickPlay();
-	}
+        clickPlay();
+    }
 
     if ( player.paused ) {
         var mpdstream = $.cookie("mpdstream");
@@ -803,10 +803,10 @@ function basename(path) {
 
 function clickLove() {
     socket.send("MPD_API_SEND_MESSAGE,mpdas," + ($('#btnlove').hasClass('active') ? "unlove" : "love"));
-	if ( $('#btnlove').hasClass('active') )
-		$('#btnlove').removeClass("active");
-	else
-		$('#btnlove').addClass("active");
+    if ( $('#btnlove').hasClass('active') )
+        $('#btnlove').removeClass("active");
+    else
+        $('#btnlove').addClass("active");
 }
 
 $('#btnrandom').on('click', function (e) {
@@ -1002,41 +1002,41 @@ $(document).keydown(function(e){
 
 function set_filter (c) {
     filter = c;
-	$('#filter > a').removeClass('active');
-	$('#f' + c).addClass('active');
+    $('#filter > a').removeClass('active');
+    $('#f' + c).addClass('active');
 
     if (filter === "") {
-    	$('#salamisandwich > tbody > tr').removeClass('hide');
-	} else if (filter === "plist") {
-    	$('#salamisandwich > tbody > tr.dir').addClass('hide');
-    	$('#salamisandwich > tbody > tr.song').addClass('hide');
-    	$('#salamisandwich > tbody > tr.plist').removeClass('hide');
+        $('#salamisandwich > tbody > tr').removeClass('hide');
+    } else if (filter === "plist") {
+        $('#salamisandwich > tbody > tr.dir').addClass('hide');
+        $('#salamisandwich > tbody > tr.song').addClass('hide');
+        $('#salamisandwich > tbody > tr.plist').removeClass('hide');
     } else {
-		$.each($('#salamisandwich > tbody > tr'), function(i, line) {
-			var first = basename($(line).attr('uri'))[0];
-			if ( $(line).hasClass('song') ) {
-				first = $(line).children().eq(3).text()[0];
-			}
+        $.each($('#salamisandwich > tbody > tr'), function(i, line) {
+            var first = basename($(line).attr('uri'))[0];
+            if ( $(line).hasClass('song') ) {
+                first = $(line).children().eq(3).text()[0];
+            }
 
-			if (filter === "num") {
-				if (!isNaN(first)) {
-					$(line).removeClass('hide');
-				} else {
-					$(line).addClass('hide');
-				}
-			} else if (filter >= "A" && filter <= "Z") {
-				if (first.toUpperCase() === filter) {
-					$(line).removeClass('hide');
-				} else {
-					$(line).addClass('hide');
-				}
-			}
-		});
-	}
+            if (filter === "num") {
+                if (!isNaN(first)) {
+                    $(line).removeClass('hide');
+                } else {
+                    $(line).addClass('hide');
+                }
+            } else if (filter >= "A" && filter <= "Z") {
+                if (first.toUpperCase() === filter) {
+                    $(line).removeClass('hide');
+                } else {
+                    $(line).addClass('hide');
+                }
+            }
+        });
+    }
 }
 
 function add_filter () {
-	$('#filter').empty();
+    $('#filter').empty();
     $('#filter').append('&nbsp;<a onclick="set_filter(\'\')" href="#/browse/'+pagination+'/'+browsepath+'">All</a>');
     $('#filter').append('&nbsp;<a id="fnum" onclick="set_filter(\'num\')" href="#/browse/'+pagination+'/'+browsepath+'">#</a>');
 
@@ -1046,6 +1046,6 @@ function add_filter () {
     }
 
     $('#filter').append('&nbsp;<a id="fplist" onclick="set_filter(\'plist\')" href="#/browse/'+pagination+'/'+browsepath+'" class="glyphicon glyphicon-list"></a>');
-	$('#f' + filter).addClass('active');
+    $('#f' + filter).addClass('active');
     $('#filter').removeClass('hide');
 }
