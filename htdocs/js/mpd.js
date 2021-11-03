@@ -30,6 +30,7 @@ var MAX_ELEMENTS_PER_PAGE = 512;
 var isTouch = Modernizr.touch ? 1 : 0;
 var filter = '';
 var scrobbler = '';
+var wss_auth_token = '';
 
 var app = $.sammy(function () {
     function runBrowse() {
@@ -38,7 +39,8 @@ var app = $.sammy(function () {
         $('#breadcrump').addClass('hide');
         $('#filter').addClass('hide');
         $('#salamisandwich').removeClass('hide').find('tr:gt(0)').remove();
-        socket.send('MPD_API_GET_QUEUE,' + pagination);
+        if (wss_auth_token !== '')
+            socket.send('MPD_API_GET_QUEUE,' + pagination);
 
         $('#panel-heading').text('Queue');
         $('#panel-heading-info').empty();
@@ -103,7 +105,11 @@ var app = $.sammy(function () {
 
             full_path = full_path + chunk;
             $('#breadcrump').append(
-                '<li><a uri="' + full_path + '">' + chunk + '</a></li>'
+                '<li><a uri="' +
+                    encodeURIComponent(full_path) +
+                    '">' +
+                    chunk +
+                    '</a></li>'
             );
             full_path += '/';
         });
@@ -245,6 +251,25 @@ $(document).ready(function () {
     );
 });
 
+function webSocketAuthenticate() {
+    var u = document.URL.split('#');
+    var separator;
+
+    if (/\/$/.test(u[0])) {
+        separator = '';
+    } else {
+        separator = '/';
+    }
+
+    $.ajax({
+        url: u[0] + separator + 'wss-auth',
+        success: function (data) {
+            wss_auth_token = data;
+            socket.send('MPD_API_AUTHORIZE,' + wss_auth_token);
+        },
+    });
+}
+
 function webSocketConnect() {
     if (typeof MozWebSocket != 'undefined') {
         socket = new MozWebSocket(get_appropriate_ws_url());
@@ -263,9 +288,8 @@ function webSocketConnect() {
                 .show();
 
             app.run();
-            /* emit initial request for output names */
-            socket.send('MPD_API_GET_OUTPUTS');
-            socket.send('MPD_API_GET_CHANNELS');
+
+            if (wss_auth_token === '') webSocketAuthenticate();
         };
 
         socket.onmessage = function got_packet(msg) {
@@ -441,9 +465,12 @@ function webSocketConnect() {
                     if (current_app !== 'browse' && current_app !== 'search')
                         break;
 
-                    /* The use of encodeURI() below might seem useless, but it's not. It prevents
+                    /* The use of encodeURIComponent() below might seem useless, but it's not. It prevents
                      * some browsers, such as Safari, from changing the normalization form of the
                      * URI from NFD to NFC, breaking our link with MPD.
+                     *
+                     * encodeURIComponent() instead of encodeURI() is used to ensure special characters
+                     * (like e.g. +) are handled correctly.
                      */
                     if ($('#salamisandwich > tbody').is(':ui-sortable')) {
                         $('#salamisandwich > tbody').sortable('destroy');
@@ -468,7 +495,7 @@ function webSocketConnect() {
                                 }
                                 $('#salamisandwich > tbody').append(
                                     '<tr uri="' +
-                                        encodeURI(obj.data[item].dir) +
+                                        encodeURIComponent(obj.data[item].dir) +
                                         '" class="' +
                                         clazz +
                                         '">' +
@@ -486,7 +513,9 @@ function webSocketConnect() {
                                 }
                                 $('#salamisandwich > tbody').append(
                                     '<tr uri="' +
-                                        encodeURI(obj.data[item].plist) +
+                                        encodeURIComponent(
+                                            obj.data[item].plist
+                                        ) +
                                         '" class="' +
                                         clazz +
                                         '">' +
@@ -517,7 +546,7 @@ function webSocketConnect() {
 
                                 $('#salamisandwich > tbody').append(
                                     '<tr uri="' +
-                                        encodeURI(obj.data[item].uri) +
+                                        encodeURIComponent(obj.data[item].uri) +
                                         '" class="song">' +
                                         '<td><span class="glyphicon glyphicon-music"></span></td>' +
                                         '<td>' +
@@ -571,7 +600,7 @@ function webSocketConnect() {
                                 socket.send(
                                     onClickAction +
                                         ',' +
-                                        decodeURI(
+                                        decodeURIComponent(
                                             $(this).parents('tr').attr('uri')
                                         )
                                 );
@@ -664,7 +693,9 @@ function webSocketConnect() {
                                 case 'song':
                                     socket.send(
                                         'MPD_API_ADD_TRACK,' +
-                                            decodeURI($(this).attr('uri'))
+                                            decodeURIComponent(
+                                                $(this).attr('uri')
+                                            )
                                     );
                                     $('.top-right')
                                         .notify({
@@ -683,7 +714,9 @@ function webSocketConnect() {
                                 case 'plist':
                                     socket.send(
                                         'MPD_API_ADD_PLAYLIST,' +
-                                            decodeURI($(this).attr('uri'))
+                                            decodeURIComponent(
+                                                $(this).attr('uri')
+                                            )
                                     );
                                     $('.top-right')
                                         .notify({
@@ -891,6 +924,15 @@ function webSocketConnect() {
                         $('#mpd_password_set').removeClass('hide');
                     break;
 
+                case 'authorized':
+                    if (obj.data === 'true') {
+                        /* emit initial request for output names */
+                        socket.send('MPD_API_GET_OUTPUTS');
+                        socket.send('MPD_API_GET_CHANNELS');
+                    } else webSocketAuthenticate();
+
+                    break;
+
                 case 'error':
                     $('.top-right')
                         .notify({
@@ -905,6 +947,7 @@ function webSocketConnect() {
 
         socket.onclose = function () {
             console.log('disconnected');
+            wss_auth_token = '';
             $('.top-right')
                 .notify({
                     message: {
