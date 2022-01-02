@@ -31,6 +31,7 @@ var isTouch = Modernizr.touch ? 1 : 0;
 var filter = '';
 var scrobbler = '';
 var wss_auth_token = '';
+var actualVolume = 0;
 
 var app = $.sammy(function () {
     function runBrowse() {
@@ -772,7 +773,8 @@ function webSocketConnect() {
                     var elapsed_seconds =
                         obj.data.elapsedTime - elapsed_minutes * 60;
 
-                    $('#volumeslider').slider(obj.data.volume);
+                    actualVolume = obj.data.volume;
+                    $('#volumeslider').slider(actualVolume);
                     $('#volume-number').text(obj.data.volume + '%');
                     var progress = Math.floor(
                         (100 * obj.data.elapsedTime) / obj.data.totalTime
@@ -1359,6 +1361,22 @@ $(document).keydown(function (e) {
             break;
         case 32: //space
             clickPlay();
+            break;
+        case 107: // + (numpad)
+        case 171: // + (keyboard)
+            var newVol = actualVolume + 5;
+            if (newVol > 100) {
+                newVol = 100;
+            }
+            socket.send('MPD_API_SET_VOLUME,' + newVol);
+            break;
+        case 109: // - (numpad)
+        case 173: // + (keyboard)
+            var newVol = actualVolume - 5;
+            if (newVol <= 0) {
+                newVol = 0;
+            }
+            socket.send('MPD_API_SET_VOLUME,' + newVol);
             break;
         default:
             return;
